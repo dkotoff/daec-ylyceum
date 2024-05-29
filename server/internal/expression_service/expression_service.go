@@ -5,17 +5,21 @@ import (
 	"fmt"
 
 	"github.com/dengsgo/math-engine/engine"
+	"github.com/dkotoff/daec-ylyceum/server/config"
+	"github.com/dkotoff/daec-ylyceum/server/logger"
 )
 
 type ExpressionsService struct {
 	expressions map[int]*Expression
 	tasks       map[int]*Task
+	config      *config.Config
 }
 
-func NewExpressionService() *ExpressionsService {
+func NewExpressionService(conf *config.Config) *ExpressionsService {
 	return &ExpressionsService{
 		expressions: make(map[int]*Expression),
 		tasks:       make(map[int]*Task),
+		config:      conf,
 	}
 }
 
@@ -99,12 +103,28 @@ func (s *ExpressionsService) GetUnfinishedTask() (TaskSchema, bool) {
 		if right.status != true {
 			continue
 		}
+
+		var op_time int
+
+		switch task.operation {
+		case "+":
+			op_time = s.config.TimeAddition
+		case "-":
+			op_time = s.config.TimeSubtraction
+		case "/":
+			op_time = s.config.TimeDivision
+		case "*":
+			op_time = s.config.TimeMultiplication
+		default:
+			logger.Error("Undefined operation")
+		}
+
 		return TaskSchema{
 			Id:             task.id,
 			Arg1:           left.result,
 			Arg2:           right.result,
 			Operation:      task.operation,
-			Operation_time: 1,
+			Operation_time: op_time,
 		}, true
 	}
 	return TaskSchema{}, false

@@ -24,10 +24,10 @@ func (s *ExpressionsService) CalculateHandler(w http.ResponseWriter, r *http.Req
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 	}
 
-	resp_schema := new(CalculateResponseSchema)
-	resp_schema.id = id
+	resp_schema := CalculateResponseSchema{Id: id}
+	resp_map := map[string]CalculateResponseSchema{"expression": resp_schema}
 
-	response, err := json.Marshal(&resp_schema)
+	response, err := json.Marshal(&resp_map)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 	}

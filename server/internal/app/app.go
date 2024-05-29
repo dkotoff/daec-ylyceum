@@ -3,7 +3,9 @@ package app
 import (
 	"net/http"
 
+	"github.com/dkotoff/daec-ylyceum/server/config"
 	expressionservice "github.com/dkotoff/daec-ylyceum/server/internal/expression_service"
+	"github.com/dkotoff/daec-ylyceum/server/logger"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -11,11 +13,11 @@ type App struct {
 	server *http.Server
 }
 
-func New() (*App, error) {
+func New(conf *config.Config) (*App, error) {
 
 	app := new(App)
 
-	service := expressionservice.NewExpressionService()
+	service := expressionservice.NewExpressionService(conf)
 
 	router := chi.NewRouter()
 
@@ -41,5 +43,6 @@ func New() (*App, error) {
 
 func (a *App) Run() error {
 	err := a.server.ListenAndServe()
+	logger.Info("Start listen and serve at localhost:%n", a.server.Addr)
 	return err
 }

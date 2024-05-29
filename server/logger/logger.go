@@ -9,7 +9,7 @@ var (
 )
 
 func init() { //nolint:gochecknoinits
-	log, _ := zap.NewProduction()
+	log, _ := zap.NewDevelopment()
 	Sugar = log.Sugar()
 }
 
