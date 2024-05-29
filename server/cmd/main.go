@@ -4,17 +4,16 @@ import (
 	"log"
 	"os"
 
+	"github.com/dkotoff/daec-ylyceum/server/app"
 	"github.com/dkotoff/daec-ylyceum/server/config"
-	"github.com/dkotoff/daec-ylyceum/server/internal/app"
-	"github.com/dkotoff/daec-ylyceum/server/logger"
 )
 
 func main() {
 
-	logger.Info("Read config...")
+	log.Print("Read config...")
 	conf, err := config.LoadFromEnv()
 	if err != nil {
-		logger.Fatal("Failed to read config")
+		log.Fatal("Failed to read config")
 	}
 
 	app, err := app.New(conf)

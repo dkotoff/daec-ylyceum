@@ -1,12 +1,14 @@
 package app
 
 import (
+	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/dkotoff/daec-ylyceum/server/config"
 	expressionservice "github.com/dkotoff/daec-ylyceum/server/internal/expression_service"
-	"github.com/dkotoff/daec-ylyceum/server/logger"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/httplog/v2"
 )
 
 type App struct {
@@ -18,8 +20,15 @@ func New(conf *config.Config) (*App, error) {
 	app := new(App)
 
 	service := expressionservice.NewExpressionService(conf)
-
 	router := chi.NewRouter()
+	logger := httplog.NewLogger("ExpressionOrchestrator", httplog.Options{
+		LogLevel:         slog.LevelInfo,
+		Concise:          false,
+		RequestHeaders:   false,
+		MessageFieldName: "message",
+	})
+
+	router.Use(httplog.RequestLogger(logger))
 
 	router.Route("/api/v1", func(r chi.Router) {
 		r.HandleFunc("/expressions", service.ExpressionsHandler)
@@ -43,6 +52,6 @@ func New(conf *config.Config) (*App, error) {
 
 func (a *App) Run() error {
 	err := a.server.ListenAndServe()
-	logger.Info("Start listen and serve at localhost:%n", a.server.Addr)
+	log.Print("Start listen and serve")
 	return err
 }

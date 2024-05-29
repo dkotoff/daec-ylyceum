@@ -1,10 +1,9 @@
 package config
 
 import (
+	"log"
 	"os"
 	"strconv"
-
-	"github.com/dkotoff/daec-ylyceum/server/logger"
 )
 
 type Config struct {
@@ -45,26 +44,26 @@ func LoadFromEnv() (*Config, error) {
 
 	conf.TimeAddition, err = strconv.Atoi(timeAddition)
 	if err != nil {
-		logger.Fatal("Failed to parse %s as int: %v", timeAddition, err)
+		log.Fatalf("Failed to parse %s as int: %v", timeAddition, err)
 		return nil, err
 
 	}
 
 	conf.TimeSubtraction, err = strconv.Atoi(timeSubtraction)
 	if err != nil {
-		logger.Fatal("Failed to parse %s as int: %v", timeSubtraction, err)
+		log.Fatalf("Failed to parse %s as int: %v", timeSubtraction, err)
 		return nil, err
 	}
 
 	conf.TimeMultiplication, err = strconv.Atoi(timeMultiplication)
 	if err != nil {
-		logger.Fatal("Failed to parse %s as int: %v", timeMultiplication, err)
+		log.Fatalf("Failed to parse %s as int: %v", timeMultiplication, err)
 		return nil, err
 	}
 
 	conf.TimeDivision, err = strconv.Atoi(timeDivision)
 	if err != nil {
-		logger.Fatal("Failed to parse %s as int: %v", timeDivision, err)
+		log.Fatalf("Failed to parse %s as int: %v", timeDivision, err)
 		return nil, err
 	}
 

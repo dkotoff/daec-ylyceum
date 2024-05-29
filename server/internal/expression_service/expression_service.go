@@ -6,7 +6,6 @@ import (
 
 	"github.com/dengsgo/math-engine/engine"
 	"github.com/dkotoff/daec-ylyceum/server/config"
-	"github.com/dkotoff/daec-ylyceum/server/logger"
 )
 
 type ExpressionsService struct {
@@ -115,8 +114,6 @@ func (s *ExpressionsService) GetUnfinishedTask() (TaskSchema, bool) {
 			op_time = s.config.TimeDivision
 		case "*":
 			op_time = s.config.TimeMultiplication
-		default:
-			logger.Error("Undefined operation")
 		}
 
 		return TaskSchema{
