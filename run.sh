@@ -11,5 +11,4 @@ go build -C ./agent/cmd
 ./server/cmd/cmd &
 ./agent/cmd/cmd
 
-
 wait

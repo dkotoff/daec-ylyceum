@@ -22,10 +22,9 @@ func New(conf *config.Config) (*App, error) {
 	service := expressionservice.NewExpressionService(conf)
 	router := chi.NewRouter()
 	logger := httplog.NewLogger("ExpressionOrchestrator", httplog.Options{
-		LogLevel:         slog.LevelInfo,
-		Concise:          false,
-		RequestHeaders:   false,
-		MessageFieldName: "message",
+		LogLevel:       slog.LevelWarn,
+		Concise:        false,
+		RequestHeaders: false,
 	})
 
 	router.Use(httplog.RequestLogger(logger))
