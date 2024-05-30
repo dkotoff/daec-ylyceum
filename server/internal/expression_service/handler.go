@@ -16,21 +16,21 @@ func (s *ExpressionsService) CalculateHandler(w http.ResponseWriter, r *http.Req
 	err := json.Unmarshal(buff, &request)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		http.Error(w, http.StatusText(422), http.StatusUnprocessableEntity)
+		return
 	}
 
 	id, err := s.AddExpression(request["expression"])
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		http.Error(w, http.StatusText(422), http.StatusUnprocessableEntity)
+		return
 	}
 
-	resp_schema := CalculateResponseSchema{Id: id}
-	resp_map := map[string]CalculateResponseSchema{"expression": resp_schema}
-
-	response, err := json.Marshal(&resp_map)
+	response, err := json.Marshal(&map[string]int{"id": id})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		http.Error(w, http.StatusText(500), http.StatusInternalServerError)
 	}
+	w.WriteHeader(http.StatusCreated)
 	w.Write(response)
 }
 
@@ -45,12 +45,15 @@ func (s *ExpressionsService) ExpressionsHandler(w http.ResponseWriter, r *http.R
 		result = append(result, schema)
 
 	}
-	result_byte, err := json.Marshal(result)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 
-	w.Write(result_byte)
+	resultSchema := map[string][]ExpressionResponseSchema{"expressions": result}
+
+	resultByte, err := json.Marshal(resultSchema)
+	if err != nil {
+		http.Error(w, http.StatusText(500), http.StatusInternalServerError)
+	}
+	w.WriteHeader(http.StatusAccepted)
+	w.Write(resultByte)
 }
 
 func (s *ExpressionsService) ExpressionHandler(w http.ResponseWriter, r *http.Request) {
@@ -58,13 +61,13 @@ func (s *ExpressionsService) ExpressionHandler(w http.ResponseWriter, r *http.Re
 	expression_id_string := chi.URLParam(r, "id")
 	expression_id, err := strconv.Atoi(expression_id_string)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, http.StatusText(500), http.StatusInternalServerError)
 		return
 	}
 
 	expression, ok := s.expressions[expression_id]
 	if !ok {
-		http.Error(w, "Expression not found", http.StatusNotFound)
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
@@ -78,25 +81,25 @@ func (s *ExpressionsService) ExpressionHandler(w http.ResponseWriter, r *http.Re
 
 	answer_buff, err := json.Marshal(answer)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, http.StatusText(500), http.StatusInternalServerError)
 		return
 	}
-
+	w.WriteHeader(200)
 	w.Write(answer_buff)
 }
 
 func (s *ExpressionsService) GetTask(w http.ResponseWriter, r *http.Request) {
 	task, ok := s.GetUnfinishedTask()
 	if !ok {
-		http.Error(w, "No tasks", http.StatusNotFound)
+		http.Error(w, http.StatusText(404), http.StatusNotFound)
 		return
 	}
 
 	out_buff, err := json.Marshal(task)
 	if err != nil {
-		http.Error(w, "Server error", http.StatusInternalServerError)
+		http.Error(w, http.StatusText(500), http.StatusInternalServerError)
 	}
-
+	w.WriteHeader(200)
 	w.Write(out_buff)
 }
 
@@ -118,4 +121,5 @@ func (s *ExpressionsService) PostTask(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		http.Error(w, http.StatusText(404), http.StatusNotFound)
 	}
+	w.WriteHeader(200)
 }

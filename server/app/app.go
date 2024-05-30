@@ -2,13 +2,12 @@ package app
 
 import (
 	"log"
-	"log/slog"
 	"net/http"
 
 	"github.com/dkotoff/daec-ylyceum/server/config"
 	expressionservice "github.com/dkotoff/daec-ylyceum/server/internal/expression_service"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/httplog/v2"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 type App struct {
@@ -21,18 +20,12 @@ func New(conf *config.Config) (*App, error) {
 
 	service := expressionservice.NewExpressionService(conf)
 	router := chi.NewRouter()
-	logger := httplog.NewLogger("ExpressionOrchestrator", httplog.Options{
-		LogLevel:       slog.LevelWarn,
-		Concise:        false,
-		RequestHeaders: false,
-	})
-
-	router.Use(httplog.RequestLogger(logger))
+	router.Use(middleware.SetHeader("Content-Type:", "application/json"))
 
 	router.Route("/api/v1", func(r chi.Router) {
 		r.HandleFunc("/expressions", service.ExpressionsHandler)
 		r.HandleFunc("/calculate", service.CalculateHandler)
-		r.HandleFunc("/expression/{id}", service.ExpressionHandler)
+		r.HandleFunc("/expressions/{id}", service.ExpressionHandler)
 
 	})
 
