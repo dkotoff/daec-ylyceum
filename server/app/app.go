@@ -36,7 +36,7 @@ func New(conf *config.Config) (*App, error) {
 
 	app.server = &http.Server{
 		Handler: router,
-		Addr:    ":5002",
+		Addr:    ":" + conf.ServerPort,
 	}
 
 	return app, nil

@@ -11,6 +11,7 @@ type Config struct {
 	TimeSubtraction    int
 	TimeMultiplication int
 	TimeDivision       int
+	ServerPort         string
 }
 
 const (
@@ -18,6 +19,7 @@ const (
 	defaultTimeSubtraction    = "1000"
 	defaultTimeMultiplication = "1000"
 	defaultTimeDivision       = "1000"
+	defaultServerPort         = "8000"
 )
 
 func LoadFromEnv() (*Config, error) {
@@ -40,6 +42,11 @@ func LoadFromEnv() (*Config, error) {
 	timeDivision := os.Getenv("TIME_DIVISION_MS")
 	if timeDivision == "" {
 		timeDivision = defaultTimeDivision
+	}
+
+	serverPort := os.Getenv("SERVER_PORT")
+	if serverPort == "" {
+		serverPort = defaultServerPort
 	}
 
 	conf.TimeAddition, err = strconv.Atoi(timeAddition)
@@ -66,6 +73,12 @@ func LoadFromEnv() (*Config, error) {
 		log.Fatalf("Failed to parse %s as int: %v", timeDivision, err)
 		return nil, err
 	}
+
+	if _, err := strconv.Atoi(serverPort); err != nil {
+		log.Printf("Failed to parse %s as int: %v", serverPort, err)
+		return nil, err
+	}
+	conf.ServerPort = serverPort
 
 	return conf, nil
 

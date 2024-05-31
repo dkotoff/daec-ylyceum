@@ -2,7 +2,6 @@ package expressionservice
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/dengsgo/math-engine/engine"
 	"github.com/dkotoff/daec-ylyceum/server/config"
@@ -89,7 +88,6 @@ func (s *ExpressionsService) SetTaskResult(id int, result int) bool {
 
 func (s *ExpressionsService) GetUnfinishedTask() (TaskSchema, bool) {
 	for _, task := range s.tasks {
-		fmt.Print("\n")
 		if task.status == true {
 			continue
 		}

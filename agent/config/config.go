@@ -6,11 +6,14 @@ import (
 	"strconv"
 )
 
+const (
+	defaultServerPort     = "8000"
+	defaultComputingPower = "4"
+)
+
 type Config struct {
-	TimeAddition       int
-	TimeSubtraction    int
-	TimeMultiplication int
-	TimeDivision       int
+	ComputingPower int
+	ServerPort     string
 }
 
 func LoadFromEnv() (*Config, error) {
@@ -18,47 +21,28 @@ func LoadFromEnv() (*Config, error) {
 
 	var err error
 
-	timeAddition := os.Getenv("TIME_ADDITION_MS")
-	if timeAddition == "" {
-		timeAddition = defaultTimeAddition
-	}
-	timeSubtraction := os.Getenv("TIME_SUBTRACTION_MS")
-	if timeSubtraction == "" {
-		timeSubtraction = defaultTimeSubtraction
-	}
-	timeMultiplication := os.Getenv("TIME_MULTIPLICATION_MS")
-	if timeMultiplication == "" {
-		timeMultiplication = defaultTimeMultiplication
-	}
-	timeDivision := os.Getenv("TIME_DIVISION_MS")
-	if timeDivision == "" {
-		timeDivision = defaultTimeDivision
+	computingPower := os.Getenv("TIME_ADDITION_MS")
+	if computingPower == "" {
+		computingPower = defaultComputingPower
 	}
 
-	conf.TimeAddition, err = strconv.Atoi(timeAddition)
+	serverPort := os.Getenv("SERVER_PORT")
+	if serverPort == "" {
+		serverPort = defaultServerPort
+	}
+
+	conf.ComputingPower, err = strconv.Atoi(computingPower)
 	if err != nil {
-		log.Fatalf("Failed to parse %s as int: %v", timeAddition, err)
+		log.Printf("Failed to parse %s as int: %v", computingPower, err)
 		return nil, err
 
 	}
 
-	conf.TimeSubtraction, err = strconv.Atoi(timeSubtraction)
-	if err != nil {
-		log.Fatalf("Failed to parse %s as int: %v", timeSubtraction, err)
+	if _, err := strconv.Atoi(serverPort); err != nil {
+		log.Printf("Failed to parse %s as int: %v", serverPort, err)
 		return nil, err
 	}
-
-	conf.TimeMultiplication, err = strconv.Atoi(timeMultiplication)
-	if err != nil {
-		log.Fatalf("Failed to parse %s as int: %v", timeMultiplication, err)
-		return nil, err
-	}
-
-	conf.TimeDivision, err = strconv.Atoi(timeDivision)
-	if err != nil {
-		log.Fatalf("Failed to parse %s as int: %v", timeDivision, err)
-		return nil, err
-	}
+	conf.ServerPort = serverPort
 
 	return conf, nil
 

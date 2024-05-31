@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/dkotoff/daec-ylyceum/agent/config"
 )
 
 type TaskSchemaResponse struct {
@@ -34,14 +36,16 @@ type ExpressionService struct {
 	output_chan chan Task
 	client      *http.Client
 	stop_chan   chan interface{}
+	config      *config.Config
 }
 
-func NewExpressionService() *ExpressionService {
+func NewExpressionService(cfg *config.Config) *ExpressionService {
 	return &ExpressionService{
 		input_chan:  make(chan Task),
 		output_chan: make(chan Task),
 		client:      &http.Client{},
 		stop_chan:   make(chan interface{}),
+		config:      cfg,
 	}
 }
 
@@ -71,15 +75,15 @@ func (s *ExpressionService) RunRequestsLoop(stop chan interface{}) {
 			case <-stop:
 				return
 			default:
-				resp, err := s.client.Get("http://localhost:5002/internal/task")
+				resp, err := s.client.Get("http://localhost:" + s.config.ServerPort + "/internal/task")
 				if err != nil {
 					log.Printf("Error at request to orcestrator: %v", err)
 					continue
 				}
-				if resp.StatusCode != 200 {
-					log.Printf("No tasks")
+				if resp.StatusCode == 404 {
 					continue
 				}
+
 				defer resp.Body.Close()
 				buff, err := io.ReadAll(resp.Body)
 				if err != nil {
@@ -117,7 +121,7 @@ func (s *ExpressionService) RunResponsesLoop(stop chan interface{}) {
 					log.Printf("Error to validate data: %v", err)
 				}
 				r := bytes.NewReader(buff)
-				_, err = s.client.Post("http://localhost:5002/internal/task", "application/json", r)
+				_, err = s.client.Post("http://localhost:"+s.config.ServerPort+"/internal/task", "application/json", r)
 				if err != nil {
 					log.Printf("Error to validate data: %v", err)
 				}
@@ -126,9 +130,9 @@ func (s *ExpressionService) RunResponsesLoop(stop chan interface{}) {
 	}()
 }
 
-func (s *ExpressionService) Run(computing_power int) {
+func (s *ExpressionService) Run() {
 	log.Print("Starting service")
-	s.RunComputers(computing_power, s.stop_chan)
+	s.RunComputers(s.config.ComputingPower, s.stop_chan)
 	s.RunRequestsLoop(s.stop_chan)
 	s.RunResponsesLoop(s.stop_chan)
 }
