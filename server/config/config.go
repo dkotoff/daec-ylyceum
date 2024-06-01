@@ -1,9 +1,10 @@
 package config
 
 import (
-	"log"
 	"os"
 	"strconv"
+
+	"github.com/dkotoff/daec-ylyceum/server/logger"
 )
 
 type Config struct {
@@ -24,7 +25,6 @@ const (
 
 func LoadFromEnv() (*Config, error) {
 	conf := &Config{}
-
 	var err error
 
 	timeAddition := os.Getenv("TIME_ADDITION_MS")
@@ -51,31 +51,31 @@ func LoadFromEnv() (*Config, error) {
 
 	conf.TimeAddition, err = strconv.Atoi(timeAddition)
 	if err != nil {
-		log.Fatalf("Failed to parse %s as int: %v", timeAddition, err)
+		logger.Error("Failed to parse %s as int: %v", timeAddition, err)
 		return nil, err
 
 	}
 
 	conf.TimeSubtraction, err = strconv.Atoi(timeSubtraction)
 	if err != nil {
-		log.Fatalf("Failed to parse %s as int: %v", timeSubtraction, err)
+		logger.Error("Failed to parse %s as int: %v", timeSubtraction, err)
 		return nil, err
 	}
 
 	conf.TimeMultiplication, err = strconv.Atoi(timeMultiplication)
 	if err != nil {
-		log.Fatalf("Failed to parse %s as int: %v", timeMultiplication, err)
+		logger.Error("Failed to parse %s as int: %v", timeMultiplication, err)
 		return nil, err
 	}
 
 	conf.TimeDivision, err = strconv.Atoi(timeDivision)
 	if err != nil {
-		log.Fatalf("Failed to parse %s as int: %v", timeDivision, err)
+		logger.Error("Failed to parse %s as int: %v", timeDivision, err)
 		return nil, err
 	}
 
 	if _, err := strconv.Atoi(serverPort); err != nil {
-		log.Printf("Failed to parse %s as int: %v", serverPort, err)
+		logger.Error("Failed to parse %s as int: %v", serverPort, err)
 		return nil, err
 	}
 	conf.ServerPort = serverPort

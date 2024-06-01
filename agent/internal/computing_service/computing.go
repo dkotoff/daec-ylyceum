@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/dkotoff/daec-ylyceum/agent/config"
+	"github.com/dkotoff/daec-ylyceum/agent/logger"
 )
 
 type TaskSchemaResponse struct {
@@ -50,27 +51,33 @@ func NewExpressionService(cfg *config.Config) *ExpressionService {
 }
 
 func (s *ExpressionService) RunComputers(count int, stop chan interface{}) {
-
-	for i := 0; i <= count; i++ {
-		go func() {
-			for true {
-				select {
-				case <-stop:
-					return
-				case task := <-s.input_chan:
-					time.Sleep(time.Millisecond * time.Duration(task.operation_time))
-					if task.operation == "/" && task.arg2 == 0 {
-						task.result = 0
-						s.output_chan <- task
-						return
-					}
-
-					task.result = ops[task.operation](task.arg1, task.arg2)
-					s.output_chan <- task
-				}
-			}
-		}()
+	for i := 0; i < count; i++ {
+		go worker(i, stop, s.input_chan, s.output_chan)
 	}
+}
+
+func worker(num int, stop chan interface{}, input chan Task, output chan Task) {
+	for {
+		select {
+		case task, ok := <-input:
+			if !ok {
+				return
+			}
+			time.Sleep(time.Millisecond * time.Duration(task.operation_time))
+			if task.operation == "/" && task.arg2 == 0 {
+				task.result = 0
+				output <- task
+				logger.Debug("Zero division at task %d calculated with result %f", task.id, task.result)
+			} else {
+				task.result = ops[task.operation](task.arg1, task.arg2)
+				logger.Debug("Task %d calculated with result %f at goroutine %d", task.id, task.result, num)
+				output <- task
+			}
+		case <-stop:
+			return
+		}
+	}
+
 }
 
 func (s *ExpressionService) RunRequestsLoop(stop chan interface{}) {
@@ -83,7 +90,7 @@ func (s *ExpressionService) RunRequestsLoop(stop chan interface{}) {
 			default:
 				resp, err := s.client.Get("http://localhost:" + s.config.ServerPort + "/internal/task")
 				if err != nil {
-					log.Printf("Error at request to orcestrator: %v", err)
+					logger.Error("Failed to connect orcestrator: %v", err)
 					continue
 				}
 				if resp.StatusCode == 404 {
@@ -93,7 +100,7 @@ func (s *ExpressionService) RunRequestsLoop(stop chan interface{}) {
 				defer resp.Body.Close()
 				buff, err := io.ReadAll(resp.Body)
 				if err != nil {
-					log.Printf("Error at request to orcestrator: %v", err)
+					logger.Error("Error at request to orcestrator: %v", err)
 					continue
 				}
 

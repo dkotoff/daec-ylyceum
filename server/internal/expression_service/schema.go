@@ -6,7 +6,7 @@ type CalculateResponseSchema struct {
 
 type ExpressionResponseSchema struct {
 	Id     int     `json:"id"`
-	Status bool    `json:"status"`
+	Status string  `json:"status"`
 	Result float64 `json:"result"`
 }
 

@@ -11,12 +11,11 @@ import (
 )
 
 func main() {
-	log.Print("Parse config...")
+
 	config, err := config.LoadFromEnv()
 	if err != nil {
 		log.Fatalf("Failed to parse config: %v", err)
 	}
-	log.Print("Config parsing was successfull")
 
 	app, err := app.New(config)
 	if err != nil {

@@ -6,14 +6,14 @@ import (
 
 	"github.com/dkotoff/daec-ylyceum/server/app"
 	"github.com/dkotoff/daec-ylyceum/server/config"
+	"github.com/dkotoff/daec-ylyceum/server/logger"
 )
 
 func main() {
-
-	log.Print("Read config...")
 	conf, err := config.LoadFromEnv()
 	if err != nil {
-		log.Fatal("Failed to read config")
+		logger.Error("Error to parse config")
+		os.Exit(1)
 	}
 
 	app, err := app.New(conf)

@@ -61,7 +61,6 @@ func (s *ExpressionsService) ExpressionHandler(w http.ResponseWriter, r *http.Re
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
-
 	answer := make(map[string]ExpressionResponseSchema)
 	answer["expression"] = expression
 	answer_buff, err := json.Marshal(answer)
@@ -101,7 +100,6 @@ func (s *ExpressionsService) PostTaskHandler(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		http.Error(w, http.StatusText(422), http.StatusUnprocessableEntity)
 	}
-
 	ok := s.SetTaskResult(request.Id, request.Result)
 	if !ok {
 		http.Error(w, http.StatusText(404), http.StatusNotFound)

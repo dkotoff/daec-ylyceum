@@ -2,13 +2,13 @@ package app
 
 import (
 	"html/template"
-	"log"
 	"net/http"
 	"os"
 
 	"github.com/dkotoff/daec-ylyceum/server/config"
 	expressionservice "github.com/dkotoff/daec-ylyceum/server/internal/expression_service"
 	"github.com/dkotoff/daec-ylyceum/server/internal/web"
+	"github.com/dkotoff/daec-ylyceum/server/logger"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -33,7 +33,7 @@ func New(conf *config.Config) (*App, error) {
 		router.Post("/submit-expression", webApp.SubmitExpression)
 		router.Get("/get-expression/{id}", webApp.GetExpressionById)
 	} else {
-		log.Print("Templates folder not found Web Application not running")
+		logger.Error("Templates folder not found Web Application not running")
 	}
 
 	router.Route("/api/v1", func(r chi.Router) {
@@ -57,7 +57,7 @@ func New(conf *config.Config) (*App, error) {
 }
 
 func (a *App) Run() error {
+	logger.Info("Start listen and serve at http://localhost%v", a.server.Addr)
 	err := a.server.ListenAndServe()
-	log.Print("Start listen and serve")
 	return err
 }

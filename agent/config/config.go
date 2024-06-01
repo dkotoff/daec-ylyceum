@@ -1,9 +1,10 @@
 package config
 
 import (
-	"log"
 	"os"
 	"strconv"
+
+	"github.com/dkotoff/daec-ylyceum/agent/logger"
 )
 
 const (
@@ -21,7 +22,7 @@ func LoadFromEnv() (*Config, error) {
 
 	var err error
 
-	computingPower := os.Getenv("TIME_ADDITION_MS")
+	computingPower := os.Getenv("COMPUTING_POWER")
 	if computingPower == "" {
 		computingPower = defaultComputingPower
 	}
@@ -33,13 +34,13 @@ func LoadFromEnv() (*Config, error) {
 
 	conf.ComputingPower, err = strconv.Atoi(computingPower)
 	if err != nil {
-		log.Printf("Failed to parse %s as int: %v", computingPower, err)
+		logger.Error("Failed to parse %s as int: %v", computingPower, err)
 		return nil, err
 
 	}
 
 	if _, err := strconv.Atoi(serverPort); err != nil {
-		log.Printf("Failed to parse %s as int: %v", serverPort, err)
+		logger.Error("Failed to parse %s as int: %v", serverPort, err)
 		return nil, err
 	}
 	conf.ServerPort = serverPort

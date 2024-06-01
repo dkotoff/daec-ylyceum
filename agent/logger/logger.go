@@ -16,13 +16,13 @@ func init() {
 }
 
 func Info(msg string, args ...any) {
-	logger.WithFields(logrus.Fields{"Service": "Orcestrator"}).Infof(msg, args...)
+	logger.WithFields(logrus.Fields{"Service": "Agent"}).Infof(msg, args...)
 }
 
 func Debug(msg string, args ...any) {
-	logger.WithFields(logrus.Fields{"Service": "Orcestrator"}).Debugf(msg, args...)
+	logger.WithFields(logrus.Fields{"Service": "Agent"}).Debugf(msg, args...)
 }
 
 func Error(msg string, args ...any) {
-	logger.WithFields(logrus.Fields{"Service": "Orcestrator"}).Errorf(msg, args...)
+	logger.WithFields(logrus.Fields{"Service": "Agent"}).Errorf(msg, args...)
 }
