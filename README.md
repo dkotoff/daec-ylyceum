@@ -2,7 +2,12 @@
 Финальная задача 2 спринта. Яндекс Лицей
 
 ## Запуск 
-### Linux/Windows with bash
+### BASH (Linux/Windows with bash)
 ```shell
 ./run.sh
 ```
+### Batch (Windows cmd.exe)
+```batch
+./run.bat
+```
+
