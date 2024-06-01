@@ -59,7 +59,7 @@ func (s *ExpressionsService) CreateTasksFromTree(node engine.ExprAST) int {
 	if _, ok := node.(engine.NumberExprAST); ok {
 		task := NewTask()
 		task.status = true
-		task.result = int(node.(engine.NumberExprAST).Val)
+		task.result = float64(node.(engine.NumberExprAST).Val)
 		s.tasks[task.id] = task
 		return task.id
 	}
@@ -73,7 +73,7 @@ func (s *ExpressionsService) CreateTasksFromTree(node engine.ExprAST) int {
 	return task.id
 }
 
-func (s *ExpressionsService) SetTaskResult(id int, result int) bool {
+func (s *ExpressionsService) SetTaskResult(id int, result float64) bool {
 
 	_, ok := s.tasks[id]
 	if !ok {
@@ -125,7 +125,35 @@ func (s *ExpressionsService) GetUnfinishedTask() (TaskSchema, bool) {
 	return TaskSchema{}, false
 }
 
-func (s *ExpressionsService) GetExpressionResult(id int) (int, bool) {
+func (s *ExpressionsService) GetExpression(id int) (ExpressionResponseSchema, bool) {
+	expression, ok := s.expressions[id]
+
+	if !ok {
+		return ExpressionResponseSchema{}, false
+	}
+
+	return ExpressionResponseSchema{
+		Id:     expression.id,
+		Status: s.tasks[expression.head_task_id].status,
+		Result: s.tasks[expression.head_task_id].result,
+	}, true
+}
+
+func (s *ExpressionsService) GetExperssions() []ExpressionResponseSchema {
+	var result []ExpressionResponseSchema
+	for _, expression := range s.expressions {
+		schema := ExpressionResponseSchema{
+			Id:     expression.id,
+			Status: s.tasks[expression.head_task_id].status,
+			Result: s.tasks[expression.head_task_id].result,
+		}
+		result = append(result, schema)
+
+	}
+	return result
+}
+
+func (s *ExpressionsService) GetExpressionResult(id int) (float64, bool) {
 
 	expression, ok := s.expressions[id]
 	if !ok {

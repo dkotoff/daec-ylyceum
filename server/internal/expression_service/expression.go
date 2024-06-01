@@ -7,7 +7,7 @@ type Expression struct {
 	head_task_id int
 	expr         string
 	status       bool
-	result       int
+	result       float64
 }
 
 func NewExpression() *Expression {

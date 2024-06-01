@@ -35,16 +35,7 @@ func (s *ExpressionsService) CalculateHandler(w http.ResponseWriter, r *http.Req
 }
 
 func (s *ExpressionsService) ExpressionsHandler(w http.ResponseWriter, r *http.Request) {
-	var result []ExpressionResponseSchema
-	for _, expression := range s.expressions {
-		schema := ExpressionResponseSchema{
-			Id:     expression.id,
-			Status: s.tasks[expression.head_task_id].status,
-			Result: s.tasks[expression.head_task_id].result,
-		}
-		result = append(result, schema)
-
-	}
+	result := s.GetExperssions()
 
 	resultSchema := map[string][]ExpressionResponseSchema{"expressions": result}
 
@@ -65,20 +56,14 @@ func (s *ExpressionsService) ExpressionHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	expression, ok := s.expressions[expression_id]
+	expression, ok := s.GetExpression(expression_id)
 	if !ok {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
 	answer := make(map[string]ExpressionResponseSchema)
-
-	answer["expression"] = ExpressionResponseSchema{
-		Id:     expression_id,
-		Status: s.tasks[expression.head_task_id].status,
-		Result: s.tasks[expression.head_task_id].result,
-	}
-
+	answer["expression"] = expression
 	answer_buff, err := json.Marshal(answer)
 	if err != nil {
 		http.Error(w, http.StatusText(500), http.StatusInternalServerError)
@@ -88,7 +73,7 @@ func (s *ExpressionsService) ExpressionHandler(w http.ResponseWriter, r *http.Re
 	w.Write(answer_buff)
 }
 
-func (s *ExpressionsService) GetTask(w http.ResponseWriter, r *http.Request) {
+func (s *ExpressionsService) GetTaskHandler(w http.ResponseWriter, r *http.Request) {
 	task, ok := s.GetUnfinishedTask()
 	if !ok {
 		http.Error(w, http.StatusText(404), http.StatusNotFound)
@@ -103,7 +88,7 @@ func (s *ExpressionsService) GetTask(w http.ResponseWriter, r *http.Request) {
 	w.Write(out_buff)
 }
 
-func (s *ExpressionsService) PostTask(w http.ResponseWriter, r *http.Request) {
+func (s *ExpressionsService) PostTaskHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	buff, err := io.ReadAll(r.Body)
 	if err != nil {

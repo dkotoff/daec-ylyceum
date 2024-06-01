@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вычислить выражение</title>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"></head>
+<body>
+    <div class="container">
+        <main>
+            <div class="row mt-4 g-4" x-data="{expressions: {{ .Expressions}} }">
+                <div class="col-8">
+                    <h1 class="mb-4">Выражения</h1>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Результат</th>
+                                <th>Статус</th>
+                                <th>...</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expressions-table-body">
+                            <template x-for="expression in expressions">
+                                <tr x-bind:id="'expression-row-'+expression.id">
+                                    <td x-text="expression.id"></td>
+                                    <td x-text="expression.result" x></td>
+                                    <td x-text="expression.status"></td>
+                                    <td><button x-bind:hx-get="'/get-expression/'+expression.id"
+                                        x-bind:hx-target="'#expression-row-' + expression.id"
+                                        hx-swap="outerHTML"
+                                        >Обновить</button></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-4">
+                    <h1 class="mb-4">Новое выражение</h1>
+                    <form hx-post="/submit-expression" hx-target="#expressions-table-body" hx-swap="beforeend">
+                        <div class="mb-2">
+                            <input type="text" name="expression" class="form-control" />
+                        </div>
+                        <input type="submit" name="Submit" id="btn btn-primary">
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

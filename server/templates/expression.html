@@ -1,0 +1,6 @@
+<tr id="expression-row-{{ .Id }}">
+    <td>{{ .Id}}</td>
+    <td>{{ .Result}}</td>
+    <td>{{ .Status}}</td>
+    <td><button hx-get="/get-expression/+{{ .Id }}" hx-target="#expression-row-{{ .Id }}" hx-swap="outerHTML">Обновить</button></td>
+</tr>

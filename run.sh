@@ -10,14 +10,20 @@ export SERVER_PORT=$(awk '/^SERVER_PORT/{print $3}' .config)
 go build -C ./server/cmd  
 go build -C ./agent/cmd
 
-./server/cmd/cmd &
+cd ./server
+go build ./cmd  
+./cmd/cmd &
 pid1=$!
 
-./agent/cmd/cmd &
+cd ../agent
+go build ./cmd
+./cmd/cmd &
 pid2=$!
 
+cd ..
+
 cleanup() {
-    echo "сleaning up"
+    echo "Cleaning up"
     kill $pid1
     kill $pid2
     rm ./server/cmd/cmd

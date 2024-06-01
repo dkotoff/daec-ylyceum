@@ -7,7 +7,7 @@ type Task struct {
 	operation string
 	left      int
 	right     int
-	result    int
+	result    float64
 	status    bool
 }
 

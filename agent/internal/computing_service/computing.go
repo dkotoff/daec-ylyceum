@@ -12,23 +12,23 @@ import (
 )
 
 type TaskSchemaResponse struct {
-	Id     int `json:"id"`
-	Result int `json:"result"`
+	Id     int     `json:"id"`
+	Result float64 `json:"result"`
 }
 
 type TaskSchema struct {
-	Id             int    `json:"id"`
-	Arg1           int    `json:"arg1"`
-	Arg2           int    `json:"arg2"`
-	Operation      string `json:"operation"`
-	Operation_time int    `json:"operation_time"`
+	Id             int     `json:"id"`
+	Arg1           float64 `json:"arg1"`
+	Arg2           float64 `json:"arg2"`
+	Operation      string  `json:"operation"`
+	Operation_time int     `json:"operation_time"`
 }
 
-var ops = map[string]func(int, int) int{
-	"+": func(a, b int) int { return a + b },
-	"-": func(a, b int) int { return a - b },
-	"*": func(a, b int) int { return a * b },
-	"/": func(a, b int) int { return a / b },
+var ops = map[string]func(float64, float64) float64{
+	"+": func(a, b float64) float64 { return a + b },
+	"-": func(a, b float64) float64 { return a - b },
+	"*": func(a, b float64) float64 { return a * b },
+	"/": func(a, b float64) float64 { return a / b },
 }
 
 type ExpressionService struct {
@@ -59,6 +59,12 @@ func (s *ExpressionService) RunComputers(count int, stop chan interface{}) {
 					return
 				case task := <-s.input_chan:
 					time.Sleep(time.Millisecond * time.Duration(task.operation_time))
+					if task.operation == "/" && task.arg2 == 0 {
+						task.result = 0
+						s.output_chan <- task
+						return
+					}
+
 					task.result = ops[task.operation](task.arg1, task.arg2)
 					s.output_chan <- task
 				}
