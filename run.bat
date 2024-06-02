@@ -1,27 +1,37 @@
 @echo off
 
-for /F "tokens=3" %%i in ('findstr /R "^TIME_DIVISION_MS" .config') do set TIME_DIVISION_MS=%%i
-for /F "tokens=3" %%i in ('findstr /R "^TIME_MULTIPLICATION_MS" .config') do set TIME_MULTIPLICATION_MS=%%i
-for /F "tokens=3" %%i in ('findstr /R "^TIME_SUBTRACTION_MS" .config') do set TIME_SUBTRACTION_MS=%%i
-for /F "tokens=3" %%i in ('findstr /R "^TIME_ADDITION_MS" .config') do set TIME_ADDITION_MS=%%i
-for /F "tokens=3" %%i in ('findstr /R "^COMPUTING_POWER" .config') do set COMPUTING_POWER=%%i
-for /F "tokens=3" %%i in ('findstr /R "^SERVER_PORT" .config') do set SERVER_PORT=%%i
+for /f "tokens=3" %%a in ('findstr "^TIME_DIVISION_MS" .config') do set TIME_DIVISION_MS=%%a
+for /f "tokens=3" %%a in ('findstr "^TIME_MULTIPLICATION_MS" .config') do set TIME_MULTIPLICATION_MS=%%a
+for /f "tokens=3" %%a in ('findstr "^TIME_SUBTRACTION_MS" .config') do set TIME_SUBTRACTION_MS=%%a
+for /f "tokens=3" %%a in ('findstr "^TIME_ADDITION_MS" .config') do set TIME_ADDITION_MS=%%a
+for /f "tokens=3" %%a in ('findstr "^COMPUTING_POWER" .config') do set COMPUTING_POWER=%%a
+for /f "tokens=3" %%a in ('findstr "^SERVER_PORT" .config') do set SERVER_PORT=%%a
 
+go build -C server\cmd  
+go build -C agent\cmd
 
-
-go build -C ./server/cmd  
-go build -C ./agent/cmd
-
-start /B cmd /C ".\server\cmd\cmd.exe"
+cd server
+go build cmd  
+start cmd\cmd
 set pid1=%!
 
-start /B cmd /C ".\agent\cmd\cmd.exe"
+cd ..\agent
+go build cmd
+start cmd\cmd
 set pid2=%!
 
+cd ..
+
+:cleanup
+echo Cleaning up
+taskkill /F /PID %pid1%
+taskkill /F /PID %pid2%
+del server\cmd\cmd.exe
+del agent\cmd\cmd.exe
+exit /b 0
+
+trap "cleanup" INT
 
 :wait
-    timeout /T 99999 >nul
-    goto wait
-
-:exit
-    call :cleanup
+timeout /t -1 /nobreak >nul
+goto wait

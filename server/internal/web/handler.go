@@ -3,11 +3,11 @@ package web
 import (
 	"encoding/json"
 	"html/template"
-	"log"
 	"net/http"
 	"strconv"
 
 	expressionservice "github.com/dkotoff/daec-ylyceum/server/internal/expression_service"
+	"github.com/dkotoff/daec-ylyceum/server/logger"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -45,11 +45,13 @@ func (wa *WebApp) SubmitExpression(w http.ResponseWriter, r *http.Request) {
 	expressionId, err := wa.expr_service.AddExpression(expr)
 
 	if err != nil {
-		log.Fatal(err)
+		logger.Error("Bad experssion")
+		return
 	}
 	expression, ok := wa.expr_service.GetExpression(expressionId)
 	if !ok {
-		log.Fatal("not found")
+		logger.Error("Experssion not fount")
+		return
 	}
 	tmpl := wa.templates["expression.html"]
 	tmpl.ExecuteTemplate(w, "expression.html", expression)
